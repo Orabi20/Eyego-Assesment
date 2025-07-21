@@ -54,11 +54,11 @@ pipeline {
 
     stage('Update K8s Deployment') {
       steps {
-        withCredentials([
-          string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
-        ]) {
+        // withCredentials([
+        //   string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+        //   string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+        //   string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+        // ]) {
           dir('k8s') {
             sh '''
               
