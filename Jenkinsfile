@@ -8,7 +8,7 @@ pipeline {
     IMAGE_TAG = "${BUILD_NUMBER}"
     CLUSTER_NAME = 'my-eks-cluster'
     NAMESPACE = 'eyego'
-    DEPLOYMENT_NAME = 'hello-eyego'
+    SERVICE_NAME = 'hello-eyego-service'
     DEPLOYMENT_FILE = 'deployment.yaml'
     SERVICE_FILE = 'service.yaml'
   }
@@ -73,7 +73,7 @@ pipeline {
               kubectl apply -n $NAMESPACE -f $DEPLOYMENT_FILE
               kubectl apply -n $NAMESPACE -f $SERVICE_FILE
 
-              kubectl get svc -n $NAMESPACE $DEPLOYMENT_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+              kubectl get svc -n $NAMESPACE $SERVICE_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
             '''
           }
         }
