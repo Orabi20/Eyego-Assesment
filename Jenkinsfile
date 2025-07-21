@@ -54,14 +54,8 @@ pipeline {
 
     stage('Update K8s Deployment') {
       steps {
-        // withCredentials([
-        //   string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
-        //   string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-        //   string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
-        // ]) {
-          dir('k8s') {
+         dir('k8s') {
             sh '''
-              
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
               
               kubectl get namespace eyego || kubectl create namespace $NAMESPACE
@@ -73,7 +67,6 @@ pipeline {
 
               kubectl get svc -n $NAMESPACE $SERVICE_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
             '''
-          
         }
       }
     }
