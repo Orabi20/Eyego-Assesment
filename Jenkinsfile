@@ -61,11 +61,7 @@ pipeline {
         ]) {
           dir('k8s') {
             sh '''
-              // aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-              // aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-              // aws configure set aws_session_token $AWS_SESSION_TOKEN
-              // aws configure set region $AWS_REGION
-
+              
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
               
               kubectl get namespace eyego || kubectl create namespace $NAMESPACE
