@@ -70,7 +70,7 @@ pipeline {
       }
     }
   }
-k get 
+  
   post {
     success {
       echo "Deployment successful"
