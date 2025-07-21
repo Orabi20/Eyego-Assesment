@@ -12,7 +12,7 @@ This Assesment demonstrates a complete CI/CD workflow using:
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 - **Jenkins**
 - **Docker**
@@ -50,13 +50,34 @@ Eyego-Assesment/
 
 ---
 
-## 🚦 CI/CD Workflow Overview
+## CI/CD Workflow Overview
 
-### 1. Clone the Project
+### 1. simple web app (Node.js)
 
-```bash
-git clone https://github.com/Orabi20/Eyego-Assesment.git
-cd Eyego-Assesment
+```app.js
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => res.send('Hello Eyego'));
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+```
+
+```package.json
+{
+  "name": "hello-eyego",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
 ```
 
 ### 2. Jenkinsfile Stages
