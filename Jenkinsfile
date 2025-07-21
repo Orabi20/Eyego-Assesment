@@ -13,7 +13,7 @@ pipeline {
   }
 
   stages {
-   stage('Login to AWS ECR') {
+    stage('Login to AWS ECR') {
       steps {
         withCredentials([
           string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
@@ -35,13 +35,23 @@ pipeline {
 
     stage('Update K8s Deployment') {
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws']]) {
+        withCredentials([
+          string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+          string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+          string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
+        ]) {
           dir('k8s') {
-            sh """
-              aws eks update-kubeconfig --region ${AWS_REGION} --name ${CLUSTER_NAME}
-              kubectl apply -f ${DEPLOYMENT_FILE}
-              kubectl apply -f ${SERVICE_FILE}
-            """
+            sh '''
+              aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+              aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+              aws configure set aws_session_token $AWS_SESSION_TOKEN
+              aws configure set region $AWS_REGION
+
+              aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+
+              kubectl apply -f $DEPLOYMENT_FILE
+              kubectl apply -f $SERVICE_FILE
+            '''
           }
         }
       }
