@@ -68,7 +68,9 @@ pipeline {
 
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
               
-               kubectl get namespace eyego || kubectl create namespace $NAMESPACE
+              kubectl get namespace eyego || kubectl create namespace $NAMESPACE
+
+              sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG|" $DEPLOYMENT_FILE
               
               kubectl apply -n $NAMESPACE -f $DEPLOYMENT_FILE
               kubectl apply -n $NAMESPACE -f $SERVICE_FILE
