@@ -87,16 +87,31 @@ app.listen(port, () => {
 - Authenticate to AWS ECR
 - Required for pushing Docker images
 
+  <img width="448" height="152" alt="image" src="https://github.com/user-attachments/assets/f8afba8f-551a-43ec-9183-77de0634a573" />
+
+
 #### Stage: Build, Tag & Push Docker Image
 - Build Docker image from Dockerfile
 - Tag it with `BUILD_NUMBER`
 - Push to AWS ECR
+
+<img width="959" height="310" alt="image" src="https://github.com/user-attachments/assets/49071b98-195c-4fee-974a-91cfc5484e9f" />
+
 
 #### Stage: Update Kubernetes Deployment
 - Update `deployment.yaml` image to latest pushed tag
 - Create namespace `eyego` if missing
 - Apply Kubernetes manifests (`deployment.yaml` and `service.yaml`)
 - Print ELB DNS to access the application
+
+  <img width="497" height="152" alt="image" src="https://github.com/user-attachments/assets/0710bce7-87d6-4d9e-a58f-717191cb9764" />
+
+  <img width="956" height="86" alt="image" src="https://github.com/user-attachments/assets/72a0cf8b-9006-44a3-990f-f0b2b0b5078d" />
+
+
+  <img width="954" height="41" alt="image" src="https://github.com/user-attachments/assets/91fe30b8-50f1-4343-8b3f-93fe6e3f6536" />
+
+
 
 ---
 
@@ -196,5 +211,12 @@ After a successful deployment, the app will be accessible via the **LoadBalancer
 ```
 a49e9e6f51e684e9580e11fb335efc31-815840059.us-east-1.elb.amazonaws.com
 ```
+<img width="608" height="29" alt="image" src="https://github.com/user-attachments/assets/9a9a96b6-c87f-4b48-9d67-da422ba50096" />
+
+
+<img width="958" height="254" alt="image" src="https://github.com/user-attachments/assets/943e57bf-95d1-42f5-9bf9-f601c0172b25" />
+
+
+
 
 ---
