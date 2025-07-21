@@ -7,6 +7,7 @@ pipeline {
     ECR_REGISTRY = '289222951012.dkr.ecr.us-east-1.amazonaws.com'
     IMAGE_TAG = "${BUILD_NUMBER}"
     CLUSTER_NAME = 'my-eks-cluster'
+    NAMESPACE = 'eyego'
     DEPLOYMENT_NAME = 'hello-eyego'
     DEPLOYMENT_FILE = 'deployment.yaml'
     SERVICE_FILE = 'service.yaml'
@@ -34,22 +35,22 @@ pipeline {
       }
     }
 
-    stage('Build Docker Image') {
-      steps {
-        sh '''
-          docker build -t $ECR_REPO:$IMAGE_TAG .
-        '''
-      }
-    }
+    // stage('Build Docker Image') {
+    //   steps {
+    //     sh '''
+    //       docker build -t $ECR_REPO:$IMAGE_TAG .
+    //     '''
+    //   }
+    // }
 
-    stage('Tag & Push Docker Image to ECR') {
-      steps {
-        sh '''
-          docker tag $ECR_REPO:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
-        '''
-      }
-    }
+    // stage('Tag & Push Docker Image to ECR') {
+    //   steps {
+    //     sh '''
+    //       docker tag $ECR_REPO:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+    //       docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+    //     '''
+    //   }
+    // }
 
     stage('Update K8s Deployment') {
       steps {
@@ -66,9 +67,13 @@ pipeline {
               aws configure set region $AWS_REGION
 
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+              
+              kubectl create namespace $NAMESPACE
+              
+              kubectl apply -n $NAMESPACE -f $DEPLOYMENT_FILE
+              kubectl apply -n $NAMESPACE -f $SERVICE_FILE
 
-              kubectl apply -f $DEPLOYMENT_FILE
-              kubectl apply -f $SERVICE_FILE
+              kubectl get svc -n $NAMESPACE $DEPLOYMENT_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
             '''
           }
         }
@@ -78,10 +83,10 @@ pipeline {
 
   post {
     success {
-      echo "Deployment successful!"
+      echo "Deployment successful"
     }
     failure {
-      echo "Deployment failed."
+      echo "Deployment failed"
     }
   }
 }
