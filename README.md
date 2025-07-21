@@ -22,7 +22,7 @@ This Assesment demonstrates a complete CI/CD workflow using:
 
 ---
 
-## 🧱 Project Structure
+## Project Structure
 
 ```
 Eyego-Assesment/
@@ -61,17 +61,17 @@ cd Eyego-Assesment
 
 ### 2. Jenkinsfile Stages
 
-#### 🔐 Stage: Login to AWS ECR
+#### Stage: Login to AWS ECR
 - Configure AWS credentials dynamically
 - Authenticate to AWS ECR
 - Required for pushing Docker images
 
-#### 🛠️ Stage: Build, Tag & Push Docker Image
+#### Stage: Build, Tag & Push Docker Image
 - Build Docker image from Dockerfile
 - Tag it with `BUILD_NUMBER`
 - Push to AWS ECR
 
-#### 🚀 Stage: Update Kubernetes Deployment
+#### Stage: Update Kubernetes Deployment
 - Update `deployment.yaml` image to latest pushed tag
 - Create namespace `eyego` if missing
 - Apply Kubernetes manifests (`deployment.yaml` and `service.yaml`)
@@ -79,7 +79,7 @@ cd Eyego-Assesment
 
 ---
 
-## 📄 Jenkinsfile Summary
+## Jenkinsfile Summary
 
 ```groovy
 pipeline {
@@ -91,12 +91,14 @@ pipeline {
     ECR_REGISTRY = '289222951012.dkr.ecr.us-east-1.amazonaws.com'
     IMAGE_TAG = "${BUILD_NUMBER}"
     CLUSTER_NAME = 'my-eks-cluster'
-    DEPLOYMENT_NAME = 'hello-eyego'
+    NAMESPACE = 'eyego'
+    SERVICE_NAME = 'hello-eyego-service'
     DEPLOYMENT_FILE = 'deployment.yaml'
     SERVICE_FILE = 'service.yaml'
   }
 
   stages {
+
     stage('Login to AWS ECR') {
       steps {
         withCredentials([
@@ -110,17 +112,23 @@ pipeline {
             aws configure set aws_session_token $AWS_SESSION_TOKEN
             aws configure set region $AWS_REGION
 
-            aws sts get-caller-identity
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
           '''
         }
       }
     }
 
-    stage('Build, Tag & Push Docker Image') {
+    stage('Build Docker Image') {
       steps {
         sh '''
           docker build -t $ECR_REPO:$IMAGE_TAG .
+        '''
+      }
+    }
+
+    stage('Tag & Push Docker Image to ECR') {
+      steps {
+        sh '''
           docker tag $ECR_REPO:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
         '''
@@ -129,42 +137,30 @@ pipeline {
 
     stage('Update K8s Deployment') {
       steps {
-        withCredentials([
-          string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-          string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
-        ]) {
-          dir('k8s') {
+         dir('k8s') {
             sh '''
-              aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-              aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-              aws configure set aws_session_token $AWS_SESSION_TOKEN
-              aws configure set region $AWS_REGION
-
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-
-              kubectl get namespace eyego || kubectl create namespace eyego
+              
+              kubectl get namespace eyego || kubectl create namespace $NAMESPACE
 
               sed -i "s|image:.*|image: $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG|" $DEPLOYMENT_FILE
+              
+              kubectl apply -n $NAMESPACE -f $DEPLOYMENT_FILE
+              kubectl apply -n $NAMESPACE -f $SERVICE_FILE
 
-              kubectl apply -n eyego -f $DEPLOYMENT_FILE
-              kubectl apply -n eyego -f $SERVICE_FILE
-
-              echo "🔗 Application DNS:"
-              kubectl get svc -n eyego $DEPLOYMENT_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+              kubectl get svc -n $NAMESPACE $SERVICE_NAME -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
             '''
-          }
         }
       }
     }
   }
-
+  
   post {
     success {
-      echo "✅ Deployment successful!"
+      echo "Deployment successful"
     }
     failure {
-      echo "❌ Deployment failed."
+      echo "Deployment failed"
     }
   }
 }
@@ -172,26 +168,12 @@ pipeline {
 
 ---
 
-## 🌐 Access the Application
+## Access the Application
 
-After a successful deployment, your app will be accessible via the **LoadBalancer DNS**, which is printed in the Jenkins logs:
+After a successful deployment, the app will be accessible via the **LoadBalancer DNS**, which is printed in the Jenkins logs:
 
 ```
-🔗 Application DNS:
-<your-elb-dns>.elb.amazonaws.com
+a49e9e6f51e684e9580e11fb335efc31-815840059.us-east-1.elb.amazonaws.com
 ```
 
 ---
-
-## 🧪 Bonus Tips
-
-- You can integrate ArgoCD for GitOps deployment by pushing updated manifests to a Git repo watched by ArgoCD.
-- Consider using `helm` for managing Kubernetes manifests.
-- Secure your Jenkins with role-based access and credentials masking.
-
----
-
-## 📬 Contact
-
-**Author:** Ahmed Orabi  
-**GitHub:** [@Orabi20](https://github.com/Orabi20)
