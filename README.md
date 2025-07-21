@@ -1,14 +1,13 @@
-# 🚀 Eyego DevOps Project: CI/CD with Jenkins, Docker, AWS ECR & EKS
+# Eyego Assesment
 
-## 📌 Project Description
+## Assesment Description
 
-This project demonstrates a complete CI/CD workflow using:
+This Assesment demonstrates a complete CI/CD workflow using:
 
 - Jenkins for Continuous Integration
 - Docker for containerization
 - AWS ECR for image storage
 - AWS EKS (Elastic Kubernetes Service) for deployment
-- ArgoCD for GitOps-based Continuous Deployment (optional)
 - Kubernetes manifests stored under `k8s/`
 
 ---
@@ -20,8 +19,6 @@ This project demonstrates a complete CI/CD workflow using:
 - **AWS ECR**
 - **AWS EKS**
 - **Kubernetes**
-- **ArgoCD** (Optional)
-- **Shell scripting**
 
 ---
 
@@ -29,6 +26,9 @@ This project demonstrates a complete CI/CD workflow using:
 
 ```
 Eyego-Assesment/
+├── app.js
+├── package.json
+├── Dockerfile
 ├── Jenkinsfile
 ├── k8s/
 │   ├── deployment.yaml
@@ -38,7 +38,7 @@ Eyego-Assesment/
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 - Jenkins running with Docker and AWS CLI installed on the agent
 - IAM user with ECR and EKS permissions
@@ -46,10 +46,7 @@ Eyego-Assesment/
   - `aws-access-key`
   - `aws-secret-key`
   - `aws-session-token`
-  - or a single AWS credential ID like `aws`
-- A running EKS cluster (e.g., `my-eks-cluster`)
-- A namespace `eyego` in Kubernetes (created automatically if not exists)
-- Jenkins plugins: Pipeline, Docker, AWS Credentials, Git, GitHub
+- A running EKS cluster
 
 ---
 
