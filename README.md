@@ -201,6 +201,7 @@ pipeline {
   }
 }
 ```
+<img width="959" height="317" alt="image" src="https://github.com/user-attachments/assets/09cd8531-e19f-41bf-94bf-9ed3cc9d2a7a" />
 
 ---
 
